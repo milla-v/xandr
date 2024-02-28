@@ -3,6 +3,7 @@ package xgen
 import (
 	"fmt"
 	"io"
+	"log"
 	"strings"
 )
 
@@ -18,7 +19,7 @@ const (
 	ValueField      SegmentFieldName = "VALUE"
 )
 
-type LegacyTextFormat struct {
+type TextFormater struct {
 	Sep1          string // Separator after UID
 	Sep2          string // Separator beetween segments
 	Sep3          string // Separator between segment fields
@@ -27,7 +28,7 @@ type LegacyTextFormat struct {
 	SegmentFields []SegmentFieldName
 }
 
-var MinimalFormat = LegacyTextFormat{
+var MinimalFormat = TextFormater{
 	Sep1:          ":",
 	Sep2:          ";",
 	Sep3:          ":",
@@ -36,7 +37,7 @@ var MinimalFormat = LegacyTextFormat{
 	SegmentFields: []SegmentFieldName{SegIdField},
 }
 
-var FullFormat = LegacyTextFormat{
+var FullFormat = TextFormater{
 	Sep1: ":",
 	Sep2: ";",
 	Sep3: ":",
@@ -49,7 +50,7 @@ var FullFormat = LegacyTextFormat{
 	},
 }
 
-var FullExternalFormat = LegacyTextFormat{
+var FullExternalFormat = TextFormater{
 	Sep1: ":",
 	Sep2: ";",
 	Sep3: ":",
@@ -63,7 +64,7 @@ var FullExternalFormat = LegacyTextFormat{
 	},
 }
 
-func (tf *LegacyTextFormat) FormatLine(ur *UserRecord) (string, error) {
+func (tf *TextFormater) FormatLine(ur *UserRecord) (string, error) {
 	if _, ok := domains[ur.Domain]; !ok {
 		return "", fmt.Errorf("invalid domain: %s", ur.Domain)
 	}
@@ -103,7 +104,7 @@ func (tf *LegacyTextFormat) FormatLine(ur *UserRecord) (string, error) {
 	return b.String(), nil
 }
 
-func genSegments(w io.Writer, tf *LegacyTextFormat, list []Segment) error {
+func genSegments(w io.Writer, tf *TextFormater, list []Segment) error {
 	const maxValue = 2147483647
 
 	for i, seg := range list {
