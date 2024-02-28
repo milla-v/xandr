@@ -81,3 +81,61 @@ func TestFullIdfa(t *testing.T) {
 		t.Fatal("invalid line:", line)
 	}
 }
+
+func TestInvalidDomain(t *testing.T) {
+	ur := &UserRecord{
+		UID:    "0000-123123-132123123-3212312",
+		Domain: "aaa",
+		Segments: []Segment{
+			{ID: 100, Expiration: 1440, Value: 123},
+			{ID: 101, Expiration: 1440, Value: 123},
+		},
+	}
+
+	_, err := FullFormat.FormatLine(ur)
+	if err == nil {
+		t.Fatal("should return error")
+	}
+
+	if err.Error() != "invalid domain: aaa" {
+		t.Fatal("invalid error message:", err.Error())
+	}
+}
+
+func TestInvalidSegId(t *testing.T) {
+	ur := &UserRecord{
+		UID: "12345",
+		Segments: []Segment{
+			{ID: 100, Expiration: 1440, Value: 123},
+			{Expiration: 1440, Value: 123},
+		},
+	}
+
+	_, err := FullFormat.FormatLine(ur)
+	if err == nil {
+		t.Fatal("should return error")
+	}
+
+	if err.Error() != "seg[1].ID is zero" {
+		t.Fatal("invalid error message:", err.Error())
+	}
+}
+
+func TestInvalidExpiration(t *testing.T) {
+	ur := &UserRecord{
+		UID: "12345",
+		Segments: []Segment{
+			{ID: 100, Expiration: 181 * 60 * 24, Value: 123},
+			{ID: 101, Expiration: 1440, Value: 123},
+		},
+	}
+
+	_, err := FullFormat.FormatLine(ur)
+	if err == nil {
+		t.Fatal("should return error")
+	}
+
+	if err.Error() != "seg[0].Expiration is not in the range [-1, 259200]" {
+		t.Fatal("invalid error message:", err.Error())
+	}
+}

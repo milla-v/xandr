@@ -126,12 +126,12 @@ func genSegments(w io.Writer, tf *LegacyTextFormat, list []Segment) error {
 				fmt.Fprintf(w, "%d", seg.MemberID)
 			case ExpirationField:
 				if seg.Expiration < -1 || seg.Expiration > MaxExpiration {
-					return fmt.Errorf("seg[%d].Expiration not in the range [-1, %d]", i, MaxExpiration)
+					return fmt.Errorf("seg[%d].Expiration is not in the range [-1, %d]", i, MaxExpiration)
 				}
 				fmt.Fprintf(w, "%d", seg.Expiration)
 			case ValueField:
 				if seg.Value < 0 || seg.Value > maxValue {
-					return fmt.Errorf("seg[%d].Value not in the range [-1, %d]", i, maxValue)
+					return fmt.Errorf("seg[%d].Value is not in the range [-1, %d]", i, maxValue)
 				}
 				fmt.Fprintf(w, "%d", seg.Value)
 			}
