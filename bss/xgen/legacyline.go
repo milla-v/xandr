@@ -150,15 +150,58 @@ func genSegments(w io.Writer, tf *TextFormater, list []Segment) error {
 	return nil
 }
 
-func NewTextFormater(sep1 string, sep2 string, sep3 string, sep4 string, sep5 string, segFields []string) *TextFormater {
+func NewTextFormater(sep1 string, sep2 string, sep3 string, sep4 string, sep5 string, segFields []SegmentFieldName) *TextFormater {
 	sp := []string{sep1, sep2, sep3, sep4, sep5}
 	var tf TextFormater
 	//check separators
 	if err := checkSeparators(sp); err != nil {
-		fmt.Errorf("seps err: ", err)
+		fmt.Errorf("check separators err: ", err)
 		panic("separators NewTextFormater error")
 	}
+
+	// check segments
+
+	//s := string(segFields)
+	//fmt.Printf(s)
+	if err := checkSegments(segFields); err != nil {
+		fmt.Errorf("check segments err: ", err)
+		panic("segments NewTextFormater error")
+	}
+
+	tf.Sep1 = sep1
+	tf.Sep2 = sep2
+	tf.Sep3 = sep3
+	tf.Sep4 = sep4
+	tf.Sep5 = sep5
+	tf.SegmentFields = segFields
+
 	return &tf
+}
+
+func checkSegments(sf []SegmentFieldName) error {
+	var err error
+	var segIDfound bool
+	var segCodeFound bool
+
+	//start check segmentFields
+	for _, s := range sf {
+		if s == SegIdField {
+			segIDfound = true
+		}
+		if s == SegCodeField {
+			segCodeFound = true
+		}
+	}
+	//check if at least  SEG_ID or SEG_CODE was choosen
+	if segIDfound == false && segCodeFound == false {
+		return fmt.Errorf("Choose at least  SEG_ID or SEG_CODE")
+	}
+	// check if SEG_CODE or SEG_ID included but not both.
+	if segIDfound == true && segCodeFound == true {
+		return fmt.Errorf("You may include SEG_CODE or SEG_ID but not both")
+	}
+
+	return err
 }
 
 func checkSeparators(sp []string) error {
