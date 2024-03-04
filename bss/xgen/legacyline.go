@@ -16,6 +16,7 @@ const (
 	MemberIdField   SegmentFieldName = "MEMBER_ID"
 	ExpirationField SegmentFieldName = "EXPIRATION"
 	ValueField      SegmentFieldName = "VALUE"
+	NotAllowed                       = "[](){}$\\/|?*+-"
 )
 
 type TextFormater struct {
@@ -146,5 +147,31 @@ func genSegments(w io.Writer, tf *TextFormater, list []Segment) error {
 		}
 	}
 
+	return nil
+}
+
+func NewTextFormater(sep1 string, sep2 string, sep3 string, sep4 string, sep5 string, segFields []string) *TextFormater {
+	sp := []string{sep1, sep2, sep3, sep4, sep5}
+	var tf TextFormater
+	//check separators
+	if err := checkSeparators(sp); err != nil {
+		fmt.Errorf("seps err: ", err)
+		panic("separators NewTextFormater error")
+	}
+	return &tf
+}
+
+func checkSeparators(sp []string) error {
+	for i, s := range sp {
+		if len(s) != 1 && s != "TAB" && s != "SPACE" {
+			return fmt.Errorf("sep%d should be a single character", i+1)
+		}
+		if s != "TAB" && s != "SPACE" {
+			fmt.Printf("s != tab or space: ", s)
+		}
+		if strings.ContainsAny(s, NotAllowed) {
+			return fmt.Errorf("sep%d: symbols "+NotAllowed+" are not allowed as a separators", i+1)
+		}
+	}
 	return nil
 }
