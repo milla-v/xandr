@@ -3,7 +3,6 @@ package xgen
 import (
 	"fmt"
 	"io"
-	"log"
 	"strings"
 )
 
