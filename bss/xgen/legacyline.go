@@ -150,32 +150,27 @@ func genSegments(w io.Writer, tf *TextFormater, list []Segment) error {
 	return nil
 }
 
-func NewTextFormater(sep1 string, sep2 string, sep3 string, sep4 string, sep5 string, segFields []SegmentFieldName) *TextFormater {
-	sp := []string{sep1, sep2, sep3, sep4, sep5}
+func NewTextFormater(text TextFormater) (*TextFormater, error) {
+	sp := []string{text.Sep1, text.Sep2, text.Sep3, text.Sep4, text.Sep5}
 	var tf TextFormater
-	//check separators
-	if err := checkSeparators(sp); err != nil {
-		fmt.Errorf("check separators err: ", err)
-		panic("separators NewTextFormater error")
+	var err error
+
+	if err = checkSeparators(sp); err != nil {
+		return &tf, err
 	}
 
-	// check segments
-
-	//s := string(segFields)
-	//fmt.Printf(s)
-	if err := checkSegments(segFields); err != nil {
-		fmt.Errorf("check segments err: ", err)
-		panic("segments NewTextFormater error")
+	if err = checkSegments(text.SegmentFields); err != nil {
+		return &tf, err
 	}
 
-	tf.Sep1 = sep1
-	tf.Sep2 = sep2
-	tf.Sep3 = sep3
-	tf.Sep4 = sep4
-	tf.Sep5 = sep5
-	tf.SegmentFields = segFields
+	tf.Sep1 = text.Sep1
+	tf.Sep2 = text.Sep2
+	tf.Sep3 = text.Sep3
+	tf.Sep4 = text.Sep4
+	tf.Sep5 = text.Sep5
+	tf.SegmentFields = text.SegmentFields
 
-	return &tf
+	return &tf, err
 }
 
 func checkSegments(sf []SegmentFieldName) error {
@@ -210,7 +205,7 @@ func checkSeparators(sp []string) error {
 			return fmt.Errorf("sep%d should be a single character", i+1)
 		}
 		if s != "TAB" && s != "SPACE" {
-			fmt.Printf("s != tab or space: ", s)
+			fmt.Println("s != tab or space: ", s)
 		}
 		if strings.ContainsAny(s, NotAllowed) {
 			return fmt.Errorf("sep%d: symbols "+NotAllowed+" are not allowed as a separators", i+1)

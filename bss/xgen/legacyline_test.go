@@ -1,6 +1,8 @@
 package xgen
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestDefault(t *testing.T) {
 	ur := &UserRecord{
@@ -137,5 +139,12 @@ func TestInvalidExpiration(t *testing.T) {
 
 	if err.Error() != "seg[0].Expiration is not in the range [-1, 259200]" {
 		t.Fatal("invalid error message:", err.Error())
+	}
+}
+
+func TestTextFormater(t *testing.T) {
+	min := TextFormater{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: MinimalFormat.SegmentFields}
+	if _, err := NewTextFormater(min); err != nil {
+		t.Fatal("TestTestFormater: ", err)
 	}
 }
