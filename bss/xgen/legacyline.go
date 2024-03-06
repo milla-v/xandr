@@ -156,11 +156,11 @@ func NewTextFormater(text TextFormater) (*TextFormater, error) {
 	var err error
 
 	if err = checkSeparators(sp); err != nil {
-		return &tf, nil
+		return nil, err
 	}
 
 	if err = checkSegments(text.SegmentFields); err != nil {
-		return &tf, nil
+		return nil, err
 	}
 
 	tf.Sep1 = text.Sep1
@@ -170,7 +170,7 @@ func NewTextFormater(text TextFormater) (*TextFormater, error) {
 	tf.Sep5 = text.Sep5
 	tf.SegmentFields = text.SegmentFields
 
-	return &tf, nil
+	return nil, err
 }
 
 func checkSegments(sf []SegmentFieldName) error {
