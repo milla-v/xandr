@@ -156,11 +156,11 @@ func NewTextFormater(text TextFormater) (*TextFormater, error) {
 	var err error
 
 	if err = checkSeparators(sp); err != nil {
-		return &tf, err
+		return &tf, nil
 	}
 
 	if err = checkSegments(text.SegmentFields); err != nil {
-		return &tf, err
+		return &tf, nil
 	}
 
 	tf.Sep1 = text.Sep1
@@ -170,13 +170,14 @@ func NewTextFormater(text TextFormater) (*TextFormater, error) {
 	tf.Sep5 = text.Sep5
 	tf.SegmentFields = text.SegmentFields
 
-	return &tf, err
+	return &tf, nil
 }
 
 func checkSegments(sf []SegmentFieldName) error {
 	var err error
 	var segIDfound bool
 	var segCodeFound bool
+	var memberIDfound bool
 
 	//start check segmentFields
 	for _, s := range sf {
@@ -185,6 +186,9 @@ func checkSegments(sf []SegmentFieldName) error {
 		}
 		if s == SegCodeField {
 			segCodeFound = true
+		}
+		if s == MemberIdField {
+			memberIDfound = true
 		}
 	}
 	//check if at least  SEG_ID or SEG_CODE was choosen
@@ -195,16 +199,20 @@ func checkSegments(sf []SegmentFieldName) error {
 	if segIDfound == true && segCodeFound == true {
 		return fmt.Errorf("You may include SEG_CODE or SEG_ID but not both")
 	}
+	// if SEG_CODE present, MEMBER_ID should be choosen too
+	if segCodeFound == true && memberIDfound == false {
+		return fmt.Errorf("If SEG_CODE present, MEMBER_ID should be choosen too")
+	}
 
 	return err
 }
 
 func checkSeparators(sp []string) error {
 	for i, s := range sp {
-		if len(s) != 1 && s != "TAB" && s != "SPACE" {
+		if len(s) != 1 && s != "\t" && s != " " {
 			return fmt.Errorf("sep%d should be a single character", i+1)
 		}
-		if s != "TAB" && s != "SPACE" {
+		if s != "\t" && s != " " {
 			fmt.Println("s != tab or space: ", s)
 		}
 		if strings.ContainsAny(s, NotAllowed) {
