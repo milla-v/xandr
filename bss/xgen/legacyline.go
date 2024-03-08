@@ -3,7 +3,6 @@ package xgen
 import (
 	"fmt"
 	"io"
-	"log"
 	"strings"
 )
 
@@ -17,6 +16,7 @@ const (
 	MemberIdField   SegmentFieldName = "MEMBER_ID"
 	ExpirationField SegmentFieldName = "EXPIRATION"
 	ValueField      SegmentFieldName = "VALUE"
+	NotAllowed                       = "[](){}$\\/|?*+-"
 )
 
 type TextFormater struct {
@@ -147,5 +147,77 @@ func genSegments(w io.Writer, tf *TextFormater, list []Segment) error {
 		}
 	}
 
+	return nil
+}
+
+func NewTextFormater(text TextFormater) (*TextFormater, error) {
+	sp := []string{text.Sep1, text.Sep2, text.Sep3, text.Sep4, text.Sep5}
+	var tf TextFormater
+	var err error
+
+	if err = checkSeparators(sp); err != nil {
+		return nil, err
+	}
+
+	if err = checkSegments(text.SegmentFields); err != nil {
+		return nil, err
+	}
+
+	tf.Sep1 = text.Sep1
+	tf.Sep2 = text.Sep2
+	tf.Sep3 = text.Sep3
+	tf.Sep4 = text.Sep4
+	tf.Sep5 = text.Sep5
+	tf.SegmentFields = text.SegmentFields
+
+	return nil, err
+}
+
+func checkSegments(sf []SegmentFieldName) error {
+	var err error
+	var segIDfound bool
+	var segCodeFound bool
+	var memberIDfound bool
+
+	//start check segmentFields
+	for _, s := range sf {
+		if s == SegIdField {
+			segIDfound = true
+		}
+		if s == SegCodeField {
+			segCodeFound = true
+		}
+		if s == MemberIdField {
+			memberIDfound = true
+		}
+	}
+	//check if at least  SEG_ID or SEG_CODE was choosen
+	if segIDfound == false && segCodeFound == false {
+		return fmt.Errorf("Choose at least  SEG_ID or SEG_CODE")
+	}
+	// check if SEG_CODE or SEG_ID included but not both.
+	if segIDfound == true && segCodeFound == true {
+		return fmt.Errorf("You may include SEG_CODE or SEG_ID but not both")
+	}
+	// if SEG_CODE present, MEMBER_ID should be choosen too
+	if segCodeFound == true && memberIDfound == false {
+		return fmt.Errorf("If SEG_CODE present, MEMBER_ID should be choosen too")
+	}
+
+	return err
+}
+
+func checkSeparators(sp []string) error {
+	for i, s := range sp {
+		if len(s) != 1 && s != "\t" && s != " " {
+			return fmt.Errorf("sep%d should be a single character", i+1)
+		}
+		if s != "\t" && s != " " {
+			fmt.Println("s != tab or space: ", s)
+		}
+		if strings.ContainsAny(s, NotAllowed) {
+			return fmt.Errorf("sep%d: symbols "+NotAllowed+" are not allowed as a separators", i+1)
+		}
+	}
 	return nil
 }

@@ -1,6 +1,9 @@
 package xgen
 
-import "testing"
+import (
+	"log"
+	"testing"
+)
 
 func TestDefault(t *testing.T) {
 	ur := &UserRecord{
@@ -121,6 +124,25 @@ func TestInvalidSegId(t *testing.T) {
 	}
 }
 
+func TestFullFormatId(t *testing.T) {
+	ur := &UserRecord{
+		UID: "12345",
+		Segments: []Segment{
+			{ID: 100, Code: "CodeTest", MemberID: 123, Expiration: 1440, Value: 123},
+		},
+	}
+
+	log.Println(ur)
+	_, err := FullExternalFormat.FormatLine(ur)
+
+	if err == nil {
+		t.Fatal("should return error")
+	}
+	if err.Error() != "seg[1].Code is empty" || err.Error() != "seg[1].MemberID is zero" {
+		t.Fatal("invalid error message:", err.Error())
+	}
+}
+
 func TestInvalidExpiration(t *testing.T) {
 	ur := &UserRecord{
 		UID: "12345",
@@ -137,5 +159,22 @@ func TestInvalidExpiration(t *testing.T) {
 
 	if err.Error() != "seg[0].Expiration is not in the range [-1, 259200]" {
 		t.Fatal("invalid error message:", err.Error())
+	}
+}
+
+func TestMinimalTextFormater(t *testing.T) {
+	min := TextFormater{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: MinimalFormat.SegmentFields}
+	if _, err := NewTextFormater(min); err != nil {
+		t.Fatal("TestMinimalTextFormater: ", err)
+	}
+}
+
+// to test SegmentsFields: SEG_ID, SEG_CODE, MEMBER_ID, EXPIRATION, VALUE"
+func TestFullTextFormater(t *testing.T) {
+	sf := []SegmentFieldName{"SEG_CODE", "MEMBER_ID"}
+	log.Println("SF: ", sf)
+	full := TextFormater{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: sf}
+	if _, err := NewTextFormater(full); err != nil {
+		t.Fatal("TestFullTextFormater: ", err)
 	}
 }
