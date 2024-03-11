@@ -113,32 +113,37 @@ func TestInvalidSegId(t *testing.T) {
 			{Expiration: 1440, Value: 123},
 		},
 	}
-
+	log.Println("testInvalidSegId ur: ", ur)
 	_, err := FullFormat.FormatLine(ur)
 	if err == nil {
 		t.Fatal("should return error")
 	}
+	log.Println("Error TestInId=", err.Error())
 
 	if err.Error() != "seg[1].ID is zero" {
 		t.Fatal("invalid error message:", err.Error())
 	}
 }
 
-func TestFullFormatId(t *testing.T) {
+func TestCodeAndMemberID(t *testing.T) {
 	ur := &UserRecord{
 		UID: "12345",
 		Segments: []Segment{
 			{ID: 100, Code: "CodeTest", MemberID: 123, Expiration: 1440, Value: 123},
+			{Code: "CodeTest", Expiration: 1440, Value: 123},
 		},
 	}
 
 	log.Println(ur)
 	_, err := FullExternalFormat.FormatLine(ur)
 
+	log.Println("Error TestFullFormatId=", err)
+
 	if err == nil {
 		t.Fatal("should return error")
 	}
-	if err.Error() != "seg[1].Code is empty" || err.Error() != "seg[1].MemberID is zero" {
+	if err.Error() != "seg[1].Code is empty" && err.Error() != "seg[1].MemberID is zero" {
+		log.Println("err.Error() -------------- ", err.Error())
 		t.Fatal("invalid error message:", err.Error())
 	}
 }
@@ -163,7 +168,7 @@ func TestInvalidExpiration(t *testing.T) {
 }
 
 func TestMinimalTextFormater(t *testing.T) {
-	min := TextFormater{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: MinimalFormat.SegmentFields}
+	min := TextEncoder{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: MinimalFormat.SegmentFields}
 	if _, err := NewTextFormater(min); err != nil {
 		t.Fatal("TestMinimalTextFormater: ", err)
 	}
@@ -173,7 +178,7 @@ func TestMinimalTextFormater(t *testing.T) {
 func TestFullTextFormater(t *testing.T) {
 	sf := []SegmentFieldName{"SEG_CODE", "MEMBER_ID"}
 	log.Println("SF: ", sf)
-	full := TextFormater{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: sf}
+	full := TextEncoder{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: sf}
 	if _, err := NewTextFormater(full); err != nil {
 		t.Fatal("TestFullTextFormater: ", err)
 	}

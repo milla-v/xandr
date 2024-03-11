@@ -3,6 +3,7 @@ package xgen
 import (
 	"fmt"
 	"io"
+	"log"
 	"strings"
 )
 
@@ -19,7 +20,7 @@ const (
 	NotAllowed                       = "[](){}$\\/|?*+-"
 )
 
-type TextFormater struct {
+type TextEncoder struct {
 	Sep1          string // Separator after UID
 	Sep2          string // Separator beetween segments
 	Sep3          string // Separator between segment fields
@@ -28,7 +29,7 @@ type TextFormater struct {
 	SegmentFields []SegmentFieldName
 }
 
-var MinimalFormat = TextFormater{
+var MinimalFormat = TextEncoder{
 	Sep1:          ":",
 	Sep2:          ";",
 	Sep3:          ":",
@@ -37,7 +38,7 @@ var MinimalFormat = TextFormater{
 	SegmentFields: []SegmentFieldName{SegIdField},
 }
 
-var FullFormat = TextFormater{
+var FullFormat = TextEncoder{
 	Sep1: ":",
 	Sep2: ";",
 	Sep3: ":",
@@ -50,7 +51,7 @@ var FullFormat = TextFormater{
 	},
 }
 
-var FullExternalFormat = TextFormater{
+var FullExternalFormat = TextEncoder{
 	Sep1: ":",
 	Sep2: ";",
 	Sep3: ":",
@@ -64,7 +65,7 @@ var FullExternalFormat = TextFormater{
 	},
 }
 
-func (tf *TextFormater) FormatLine(ur *UserRecord) (string, error) {
+func (tf *TextEncoder) FormatLine(ur *UserRecord) (string, error) {
 	if _, ok := domains[ur.Domain]; !ok {
 		return "", fmt.Errorf("invalid domain: %s", ur.Domain)
 	}
@@ -104,7 +105,7 @@ func (tf *TextFormater) FormatLine(ur *UserRecord) (string, error) {
 	return b.String(), nil
 }
 
-func genSegments(w io.Writer, tf *TextFormater, list []Segment) error {
+func genSegments(w io.Writer, tf *TextEncoder, list []Segment) error {
 	const maxValue = 2147483647
 
 	for i, seg := range list {
@@ -117,6 +118,7 @@ func genSegments(w io.Writer, tf *TextFormater, list []Segment) error {
 				fmt.Fprintf(w, "%d", seg.ID)
 			case SegCodeField:
 				if seg.Code == "" {
+					log.Printf("------------- seg[%d].Code is empty", i)
 					return fmt.Errorf("seg[%d].Code is empty", i)
 				}
 				io.WriteString(w, seg.Code)
@@ -150,9 +152,9 @@ func genSegments(w io.Writer, tf *TextFormater, list []Segment) error {
 	return nil
 }
 
-func NewTextFormater(text TextFormater) (*TextFormater, error) {
+func NewTextFormater(text TextEncoder) (*TextEncoder, error) {
 	sp := []string{text.Sep1, text.Sep2, text.Sep3, text.Sep4, text.Sep5}
-	var tf TextFormater
+	var tf TextEncoder
 	var err error
 
 	if err = checkSeparators(sp); err != nil {
@@ -162,7 +164,7 @@ func NewTextFormater(text TextFormater) (*TextFormater, error) {
 	if err = checkSegments(text.SegmentFields); err != nil {
 		return nil, err
 	}
-
+	log.Println("checkSegments err = ", err)
 	tf.Sep1 = text.Sep1
 	tf.Sep2 = text.Sep2
 	tf.Sep3 = text.Sep3
