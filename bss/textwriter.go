@@ -29,6 +29,8 @@ func NewTextFileWriter(fname string, p TextFileParameters) (*TextFileWriter, err
 		file: createdFile,
 	}
 
+	// create new textencoder, NewTextEncioder should check separators and seg fields.
+
 	return tw, nil
 }
 
@@ -44,6 +46,9 @@ func (tw *TextFileWriter) Close() error {
 
 func (w *TextFileWriter) Append(ur *UserRecord) error {
 	var err error
+
+	// use text encoder FormatFile to produce a formatetd line
+	// write line to the file
 
 	return err
 }
