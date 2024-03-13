@@ -1,5 +1,9 @@
 package bss
 
+import (
+	"github.com/milla-v/xandr/bss/xgen"
+)
+
 const (
 	Expired           = -1            // Set Segment.Expiration field to remove user from the segment
 	DefaultExpiration = 0             // Segment expiration will be set to member's default
@@ -34,3 +38,14 @@ type UserRecord struct {
 
 	Segments []Segment
 }
+
+type TextFileParameters = xgen.TextEncoder
+
+/*type TextFileParameter struct {
+	Sep1          string // Separator after UID
+	Sep2          string // Separator beetween segments
+	Sep3          string // Separator between segment fields
+	Sep4          string // Separator between segment additions block and segment removals block
+	Sep5          string // Separator before domain
+	SegmentFields []SegmentFieldName
+}*/

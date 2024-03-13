@@ -152,7 +152,7 @@ func genSegments(w io.Writer, tf *TextEncoder, list []Segment) error {
 	return nil
 }
 
-func NewTextFormater(text TextEncoder) (*TextEncoder, error) {
+func NewTextEncoder(text TextEncoder) (*TextEncoder, error) {
 	sp := []string{text.Sep1, text.Sep2, text.Sep3, text.Sep4, text.Sep5}
 	var tf TextEncoder
 	var err error
