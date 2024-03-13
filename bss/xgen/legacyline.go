@@ -172,7 +172,7 @@ func NewTextEncoder(text TextEncoder) (*TextEncoder, error) {
 	tf.Sep5 = text.Sep5
 	tf.SegmentFields = text.SegmentFields
 
-	return nil, err
+	return &tf, nil
 }
 
 func checkSegments(sf []SegmentFieldName) error {

@@ -48,13 +48,14 @@ func TestTextWriter2(t *testing.T) {
 		columns := strings.Split(line, ",")
 		t.Logf("cols: %+v", columns)
 		segID, err := strconv.ParseInt(columns[1], 10, 32)
+		log.Println(line)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		ur := UserRecord{
+		ur := xgen.UserRecord{
 			UID: columns[0],
-			Segments: []Segment{
+			Segments: []xgen.Segment{
 				{ID: int32(segID)},
 			},
 		}
@@ -86,7 +87,7 @@ func TestTextWriter(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var users []UserRecord
+	var users []xgen.UserRecord
 
 	for _, u := range users {
 		if err := w.Append(&u); err != nil {
