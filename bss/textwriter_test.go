@@ -24,7 +24,8 @@ ur := &UserRecord{
 */
 
 func TestTextWriter2(t *testing.T) {
-	const input = `UID,SegID
+	const input = `
+UID,SegID
 12345,100
 12346,100
 `
@@ -56,6 +57,7 @@ func TestTextWriter2(t *testing.T) {
 		ur := xgen.UserRecord{
 			UID: columns[0],
 			Segments: []xgen.Segment{
+				{ID: 55},
 				{ID: int32(segID)},
 			},
 		}
@@ -97,11 +99,10 @@ func TestTextWriter(t *testing.T) {
 
 	//var users []xgen.UserRecord
 
-	for i := 0; i < len(ur.Segments); i++ {
-		if err := w.Append(ur); err != nil {
-			t.Fatal(err)
-		}
+	if err := w.Append(ur); err != nil {
+		t.Fatal(err)
 	}
+
 	/*
 		for _, u := range users {
 			if err := w.Append(&u); err != nil {
