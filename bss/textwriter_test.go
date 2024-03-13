@@ -78,6 +78,14 @@ func TestTextWriter2(t *testing.T) {
 }
 
 func TestTextWriter(t *testing.T) {
+	ur := &xgen.UserRecord{
+		UID:    "12345",
+		Domain: "",
+		Segments: []xgen.Segment{
+			{ID: 100},
+			{ID: 101},
+		},
+	}
 
 	log.Println("Minimal Format: ", MinimalFormat)
 	params := TextFileParameters(MinimalFormat)
@@ -87,14 +95,20 @@ func TestTextWriter(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var users []xgen.UserRecord
+	//var users []xgen.UserRecord
 
-	for _, u := range users {
-		if err := w.Append(&u); err != nil {
+	for i := 0; i < len(ur.Segments); i++ {
+		if err := w.Append(ur); err != nil {
 			t.Fatal(err)
 		}
 	}
-
+	/*
+		for _, u := range users {
+			if err := w.Append(&u); err != nil {
+				t.Fatal(err)
+			}
+		}
+	*/
 	if err := w.Close(); err != nil {
 		t.Fatal(err)
 	}

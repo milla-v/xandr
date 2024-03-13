@@ -46,9 +46,6 @@ func NewTextFileWriter(fname string, p TextFileParameters) (*TextFileWriter, err
 	if err != nil {
 		log.Println("NewCheckEncoder result: ", err)
 		return nil, err
-	} else {
-		log.Println("Can write data to a file")
-		log.Println("p :", p.SegmentFields)
 	}
 
 	return tw, nil
@@ -64,10 +61,17 @@ func (tw *TextFileWriter) Close() error {
 	return nil
 }
 
+//strings.Split(strings.TrimSpace(input), "\n")
+
 func (w *TextFileWriter) Append(ur *xgen.UserRecord) error {
-	var err error
 	line, err := w.encoder.FormatLine(ur)
 	log.Println("line:", line)
+
+	_, err = w.w.WriteString(line + "\n")
+	if err != nil {
+		log.Println("Could not write line to the file")
+		return err
+	}
 
 	// use text encoder FormatLine to produce a formatetd line
 	// write line to the file
