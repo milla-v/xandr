@@ -10,24 +10,13 @@ import (
 	"github.com/milla-v/xandr/bss/xgen"
 )
 
-var MinimalFormat = xgen.MinimalFormat
-
-/*
-ur := &UserRecord{
-                UID:    "12345",
-                Domain: "",
-                Segments: []Segment{
-                        {ID: 100, Expiration: Expired},
-                        {ID: 101, Expiration: Expired},
-                },
-        }
-*/
+var FullFormat = xgen.FullFormat
 
 func TestTextWriter2(t *testing.T) {
 	const input = `
 UID,SegID
 12345,100
-12346,100
+12346,102
 `
 
 	p := TextFileParameters{
@@ -80,36 +69,50 @@ UID,SegID
 }
 
 func TestTextWriter(t *testing.T) {
-	ur := &xgen.UserRecord{
-		UID:    "12345",
-		Domain: "",
-		Segments: []xgen.Segment{
-			{ID: 100},
-			{ID: 101},
-		},
-	}
+	const input = `
+	UID,SegID,Expiration,Value
+	12345,100,1440,123
+	12346,101,1440,123`
 
-	log.Println("Minimal Format: ", MinimalFormat)
-	params := TextFileParameters(MinimalFormat)
-	log.Println("Params: ", params)
-	w, err := NewTextFileWriter("1.txt", params)
+	params := TextFileParameters(FullFormat)
+	w, err := NewTextFileWriter("2.txt", params)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	//var users []xgen.UserRecord
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	for _, line := range lines[1:] {
+		columns := strings.Split(line, ",")
+		log.Println("UID: ", columns[0])
+		segID, err := strconv.ParseInt(columns[1], 10, 32)
+		if err != nil {
+			t.Fatal(err)
+		}
+		log.Println("segID: ", segID)
+		expiration, err := strconv.ParseInt(columns[2], 10, 32)
+		if err != nil {
+			t.Fatal(err)
+		}
+		log.Println("Expiration: ", expiration)
+		value, err := strconv.ParseInt(columns[3], 10, 32)
+		if err != nil {
+			t.Fatal(err)
+		}
+		log.Println("Value: ", value)
 
-	if err := w.Append(ur); err != nil {
-		t.Fatal(err)
+		ur := xgen.UserRecord{
+			UID: columns[0],
+			Segments: []xgen.Segment{
+				{ID: int32(segID)},
+				{Expiration: int32(expiration)},
+				{Value: int32(value)},
+			},
+		}
+		if err := w.Append(&ur); err != nil {
+			t.Fatal(err)
+		}
 	}
 
-	/*
-		for _, u := range users {
-			if err := w.Append(&u); err != nil {
-				t.Fatal(err)
-			}
-		}
-	*/
 	if err := w.Close(); err != nil {
 		t.Fatal(err)
 	}

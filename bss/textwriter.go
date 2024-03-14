@@ -3,7 +3,6 @@ package bss
 import (
 	"bufio"
 	"io"
-	"log"
 	"os"
 
 	"github.com/milla-v/xandr/bss/xgen"
@@ -19,17 +18,6 @@ type TextFileWriter struct {
 	encoder *xgen.TextEncoder
 }
 
-/*
-ur := &UserRecord{
-                UID:    "12345",
-                Domain: "",
-                Segments: []Segment{
-                        {ID: 100, Expiration: Expired},
-                        {ID: 101, Expiration: Expired},
-                },
-        }
-*/
-
 func NewTextFileWriter(fname string, p TextFileParameters) (*TextFileWriter, error) {
 	createdFile, err := os.Create(fname)
 	if err != nil {
@@ -41,10 +29,8 @@ func NewTextFileWriter(fname string, p TextFileParameters) (*TextFileWriter, err
 		file: createdFile,
 	}
 
-	// create new textencoder, NewTextEncoder should check separators and seg fields.
 	tw.encoder, err = xgen.NewTextEncoder(p)
 	if err != nil {
-		log.Println("NewCheckEncoder result: ", err)
 		return nil, err
 	}
 
@@ -61,20 +47,16 @@ func (tw *TextFileWriter) Close() error {
 	return nil
 }
 
-//strings.Split(strings.TrimSpace(input), "\n")
-
 func (w *TextFileWriter) Append(ur *xgen.UserRecord) error {
 	line, err := w.encoder.FormatLine(ur)
-	log.Println("line:", line)
-
-	_, err = w.w.WriteString(line + "\n")
 	if err != nil {
-		log.Println("Could not write line to the file")
 		return err
 	}
 
-	// use text encoder FormatLine to produce a formatetd line
-	// write line to the file
+	_, err = w.w.WriteString(line + "\n")
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
