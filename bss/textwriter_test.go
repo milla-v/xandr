@@ -103,9 +103,11 @@ func TestTextWriter(t *testing.T) {
 		ur := xgen.UserRecord{
 			UID: columns[0],
 			Segments: []xgen.Segment{
-				{ID: int32(segID)},
-				{Expiration: int32(expiration)},
-				{Value: int32(value)},
+				xgen.Segment{
+					ID:         int32(segID),
+					Expiration: int32(expiration),
+					Value:      int32(value),
+				},
 			},
 		}
 		if err := w.Append(&ur); err != nil {
