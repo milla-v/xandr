@@ -83,22 +83,18 @@ func TestTextWriter(t *testing.T) {
 	lines := strings.Split(strings.TrimSpace(input), "\n")
 	for _, line := range lines[1:] {
 		columns := strings.Split(line, ",")
-		log.Println("UID: ", columns[0])
 		segID, err := strconv.ParseInt(columns[1], 10, 32)
 		if err != nil {
 			t.Fatal(err)
 		}
-		log.Println("segID: ", segID)
 		expiration, err := strconv.ParseInt(columns[2], 10, 32)
 		if err != nil {
 			t.Fatal(err)
 		}
-		log.Println("Expiration: ", expiration)
 		value, err := strconv.ParseInt(columns[3], 10, 32)
 		if err != nil {
 			t.Fatal(err)
 		}
-		log.Println("Value: ", value)
 
 		ur := xgen.UserRecord{
 			UID: columns[0],
