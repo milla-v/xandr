@@ -8,8 +8,6 @@ import (
 	"github.com/milla-v/xandr/bss/xgen"
 )
 
-type TextFileParameters = xgen.TextEncoder
-
 // TextFileWriter provides writing user-segments data to a file according Legacy BSS file format
 // described on https://learn.microsoft.com/en-us/xandr/bidders/legacy-bss-file-format
 type TextFileWriter struct {
@@ -18,7 +16,7 @@ type TextFileWriter struct {
 	encoder *xgen.TextEncoder
 }
 
-func NewTextFileWriter(fname string, p TextFileParameters) (*TextFileWriter, error) {
+func NewTextFileWriter(fname string, params xgen.TextEncoderParameters) (*TextFileWriter, error) {
 	createdFile, err := os.Create(fname)
 	if err != nil {
 		return nil, err
@@ -29,7 +27,7 @@ func NewTextFileWriter(fname string, p TextFileParameters) (*TextFileWriter, err
 		file: createdFile,
 	}
 
-	tw.encoder, err = xgen.NewTextEncoder(p)
+	tw.encoder, err = xgen.NewTextEncoder(params)
 	if err != nil {
 		return nil, err
 	}
