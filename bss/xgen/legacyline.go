@@ -3,7 +3,6 @@ package xgen
 import (
 	"fmt"
 	"io"
-	"log"
 	"strings"
 )
 
@@ -20,7 +19,7 @@ const (
 	NotAllowed                       = "[](){}$\\/|?*+-"
 )
 
-type TextEncoder struct {
+type TextEncoderParameters struct {
 	Sep1          string // Separator after UID
 	Sep2          string // Separator beetween segments
 	Sep3          string // Separator between segment fields
@@ -29,7 +28,11 @@ type TextEncoder struct {
 	SegmentFields []SegmentFieldName
 }
 
-var MinimalFormat = TextEncoder{
+type TextEncoder struct {
+	parameters TextEncoderParameters
+}
+
+var MinimalFormat = TextEncoderParameters{
 	Sep1:          ":",
 	Sep2:          ";",
 	Sep3:          ":",
@@ -38,7 +41,7 @@ var MinimalFormat = TextEncoder{
 	SegmentFields: []SegmentFieldName{SegIdField},
 }
 
-var FullFormat = TextEncoder{
+var FullFormat = TextEncoderParameters{
 	Sep1: ":",
 	Sep2: ";",
 	Sep3: ":",
@@ -51,7 +54,7 @@ var FullFormat = TextEncoder{
 	},
 }
 
-var FullExternalFormat = TextEncoder{
+var FullExternalFormat = TextEncoderParameters{
 	Sep1: ":",
 	Sep2: ";",
 	Sep3: ":",
@@ -73,7 +76,7 @@ func (tf *TextEncoder) FormatLine(ur *UserRecord) (string, error) {
 	var b strings.Builder
 
 	b.WriteString(ur.UID)
-	b.WriteString(tf.Sep1)
+	b.WriteString(tf.parameters.Sep1)
 
 	var adds []Segment
 	var rems []Segment
@@ -91,14 +94,14 @@ func (tf *TextEncoder) FormatLine(ur *UserRecord) (string, error) {
 	}
 
 	if len(rems) > 0 {
-		b.WriteString(tf.Sep4)
+		b.WriteString(tf.parameters.Sep4)
 		if err := genSegments(&b, tf, rems); err != nil {
 			return "", nil
 		}
 	}
 
 	if ur.Domain != "" {
-		b.WriteString(tf.Sep5)
+		b.WriteString(tf.parameters.Sep5)
 		b.WriteString(string(ur.Domain))
 	}
 
@@ -109,7 +112,7 @@ func genSegments(w io.Writer, tf *TextEncoder, list []Segment) error {
 	const maxValue = 2147483647
 
 	for i, seg := range list {
-		for j, sf := range tf.SegmentFields {
+		for j, sf := range tf.parameters.SegmentFields {
 			switch sf {
 			case SegIdField:
 				if seg.ID == 0 {
@@ -118,7 +121,6 @@ func genSegments(w io.Writer, tf *TextEncoder, list []Segment) error {
 				fmt.Fprintf(w, "%d", seg.ID)
 			case SegCodeField:
 				if seg.Code == "" {
-					log.Printf("------------- seg[%d].Code is empty", i)
 					return fmt.Errorf("seg[%d].Code is empty", i)
 				}
 				io.WriteString(w, seg.Code)
@@ -139,21 +141,28 @@ func genSegments(w io.Writer, tf *TextEncoder, list []Segment) error {
 				fmt.Fprintf(w, "%d", seg.Value)
 			}
 
-			if j < len(tf.SegmentFields)-1 {
-				io.WriteString(w, tf.Sep3)
+			if j < len(tf.parameters.SegmentFields)-1 {
+				io.WriteString(w, tf.parameters.Sep3)
 			}
 		}
 
 		if i < len(list)-1 {
-			io.WriteString(w, tf.Sep2)
+			io.WriteString(w, tf.parameters.Sep2)
 		}
 	}
 
 	return nil
 }
 
-func NewTextEncoder(text TextEncoder) (*TextEncoder, error) {
-	sp := []string{text.Sep1, text.Sep2, text.Sep3, text.Sep4, text.Sep5}
+func NewTextEncoder(parameters TextEncoderParameters) (*TextEncoder, error) {
+	sp := []string{
+		parameters.Sep1,
+		parameters.Sep2,
+		parameters.Sep3,
+		parameters.Sep4,
+		parameters.Sep5,
+	}
+
 	var tf TextEncoder
 	var err error
 
@@ -161,16 +170,16 @@ func NewTextEncoder(text TextEncoder) (*TextEncoder, error) {
 		return nil, err
 	}
 
-	if err = checkSegments(text.SegmentFields); err != nil {
+	if err = checkSegments(parameters.SegmentFields); err != nil {
 		return nil, err
 	}
-	log.Println("checkSegments err = ", err)
-	tf.Sep1 = text.Sep1
-	tf.Sep2 = text.Sep2
-	tf.Sep3 = text.Sep3
-	tf.Sep4 = text.Sep4
-	tf.Sep5 = text.Sep5
-	tf.SegmentFields = text.SegmentFields
+
+	tf.parameters.Sep1 = parameters.Sep1
+	tf.parameters.Sep2 = parameters.Sep2
+	tf.parameters.Sep3 = parameters.Sep3
+	tf.parameters.Sep4 = parameters.Sep4
+	tf.parameters.Sep5 = parameters.Sep5
+	tf.parameters.SegmentFields = parameters.SegmentFields
 
 	return &tf, nil
 }
@@ -213,9 +222,6 @@ func checkSeparators(sp []string) error {
 	for i, s := range sp {
 		if len(s) != 1 && s != "\t" && s != " " {
 			return fmt.Errorf("sep%d should be a single character", i+1)
-		}
-		if s != "\t" && s != " " {
-			fmt.Println("s != tab or space: ", s)
 		}
 		if strings.ContainsAny(s, NotAllowed) {
 			return fmt.Errorf("sep%d: symbols "+NotAllowed+" are not allowed as a separators", i+1)
