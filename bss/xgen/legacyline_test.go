@@ -164,7 +164,7 @@ func TestInvalidExpiration(t *testing.T) {
 }
 
 func TestMinimalTextEncoder(t *testing.T) {
-	min := TextEncoder{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: MinimalFormat.SegmentFields}
+	min := TextEncoderParameters{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: MinimalFormat.SegmentFields}
 	if _, err := NewTextEncoder(min); err != nil {
 		t.Fatal("TestMinimalTextFormater: ", err)
 	}
@@ -174,7 +174,7 @@ func TestMinimalTextEncoder(t *testing.T) {
 func TestFullTextEncoder(t *testing.T) {
 	sf := []SegmentFieldName{"SEG_CODE", "MEMBER_ID"}
 	log.Println("SF: ", sf)
-	full := TextEncoder{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: sf}
+	full := TextEncoderParameters{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: sf}
 	if _, err := NewTextEncoder(full); err != nil {
 		t.Fatal("TestFullTextFormater: ", err)
 	}

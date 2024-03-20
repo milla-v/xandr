@@ -20,7 +20,7 @@ const (
 	NotAllowed                       = "[](){}$\\/|?*+-"
 )
 
-type TextEncoder struct {
+type TextEncoderParameters struct {
 	Sep1          string // Separator after UID
 	Sep2          string // Separator beetween segments
 	Sep3          string // Separator between segment fields
@@ -29,7 +29,7 @@ type TextEncoder struct {
 	SegmentFields []SegmentFieldName
 }
 
-var MinimalFormat = TextEncoder{
+var MinimalFormat = TextEncoderParameters{
 	Sep1:          ":",
 	Sep2:          ";",
 	Sep3:          ":",
@@ -38,7 +38,7 @@ var MinimalFormat = TextEncoder{
 	SegmentFields: []SegmentFieldName{SegIdField},
 }
 
-var FullFormat = TextEncoder{
+var FullFormat = TextEncoderParameters{
 	Sep1: ":",
 	Sep2: ";",
 	Sep3: ":",
@@ -51,7 +51,7 @@ var FullFormat = TextEncoder{
 	},
 }
 
-var FullExternalFormat = TextEncoder{
+var FullExternalFormat = TextEncoderParameters{
 	Sep1: ":",
 	Sep2: ";",
 	Sep3: ":",
@@ -65,7 +65,7 @@ var FullExternalFormat = TextEncoder{
 	},
 }
 
-func (tf *TextEncoder) FormatLine(ur *UserRecord) (string, error) {
+func (tf *TextEncoderParameters) FormatLine(ur *UserRecord) (string, error) {
 	if _, ok := domains[ur.Domain]; !ok {
 		return "", fmt.Errorf("invalid domain: %s", ur.Domain)
 	}
@@ -105,7 +105,7 @@ func (tf *TextEncoder) FormatLine(ur *UserRecord) (string, error) {
 	return b.String(), nil
 }
 
-func genSegments(w io.Writer, tf *TextEncoder, list []Segment) error {
+func genSegments(w io.Writer, tf *TextEncoderParameters, list []Segment) error {
 	const maxValue = 2147483647
 
 	for i, seg := range list {
@@ -152,9 +152,9 @@ func genSegments(w io.Writer, tf *TextEncoder, list []Segment) error {
 	return nil
 }
 
-func NewTextEncoder(text TextEncoder) (*TextEncoder, error) {
+func NewTextEncoder(text TextEncoderParameters) (*TextEncoderParameters, error) {
 	sp := []string{text.Sep1, text.Sep2, text.Sep3, text.Sep4, text.Sep5}
-	var tf TextEncoder
+	var tf TextEncoderParameters
 	var err error
 
 	if err = checkSeparators(sp); err != nil {
