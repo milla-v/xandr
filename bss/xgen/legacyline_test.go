@@ -1,7 +1,6 @@
 package xgen
 
 import (
-	"log"
 	"testing"
 )
 
@@ -15,7 +14,12 @@ func TestDefault(t *testing.T) {
 		},
 	}
 
-	line, err := MinimalFormat.FormatLine(ur)
+	enc, err := NewTextEncoder(MinimalFormat)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	line, err := enc.FormatLine(ur)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +39,12 @@ func TestExpired(t *testing.T) {
 		},
 	}
 
-	line, err := MinimalFormat.FormatLine(ur)
+	enc, err := NewTextEncoder(MinimalFormat)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	line, err := enc.FormatLine(ur)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +64,12 @@ func TestFull(t *testing.T) {
 		},
 	}
 
-	line, err := FullFormat.FormatLine(ur)
+	enc, err := NewTextEncoder(FullFormat)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	line, err := enc.FormatLine(ur)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +89,12 @@ func TestFullIdfa(t *testing.T) {
 		},
 	}
 
-	line, err := FullFormat.FormatLine(ur)
+	enc, err := NewTextEncoder(FullFormat)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	line, err := enc.FormatLine(ur)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,7 +114,12 @@ func TestInvalidDomain(t *testing.T) {
 		},
 	}
 
-	_, err := FullFormat.FormatLine(ur)
+	enc, err := NewTextEncoder(FullFormat)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = enc.FormatLine(ur)
 	if err == nil {
 		t.Fatal("should return error")
 	}
@@ -113,7 +137,13 @@ func TestInvalidSegId(t *testing.T) {
 			{Expiration: 1440, Value: 123},
 		},
 	}
-	_, err := FullFormat.FormatLine(ur)
+
+	enc, err := NewTextEncoder(FullFormat)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = enc.FormatLine(ur)
 	if err == nil {
 		t.Fatal("should return error")
 	}
@@ -132,9 +162,14 @@ func TestCodeAndMemberID(t *testing.T) {
 		},
 	}
 
-	_, err := FullExternalFormat.FormatLine(ur)
+	enc, err := NewTextEncoder(FullExternalFormat)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	log.Println("UR: ", ur)
+	_, err = enc.FormatLine(ur)
+
+	t.Log("UR: ", ur)
 
 	if err == nil {
 		t.Fatal("should return error")
@@ -153,7 +188,12 @@ func TestInvalidExpiration(t *testing.T) {
 		},
 	}
 
-	_, err := FullFormat.FormatLine(ur)
+	enc, err := NewTextEncoder(FullFormat)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = enc.FormatLine(ur)
 	if err == nil {
 		t.Fatal("should return error")
 	}
@@ -164,18 +204,35 @@ func TestInvalidExpiration(t *testing.T) {
 }
 
 func TestMinimalTextEncoder(t *testing.T) {
-	min := TextEncoder{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: MinimalFormat.SegmentFields}
-	if _, err := NewTextEncoder(min); err != nil {
-		t.Fatal("TestMinimalTextFormater: ", err)
+	params := TextEncoderParameters{
+		Sep1:          ":",
+		Sep2:          ";",
+		Sep3:          ":",
+		Sep4:          "#",
+		Sep5:          "^",
+		SegmentFields: MinimalFormat.SegmentFields,
+	}
+
+	_, err := NewTextEncoder(params)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
 // to test SegmentsFields: SEG_ID, SEG_CODE, MEMBER_ID, EXPIRATION, VALUE"
 func TestFullTextEncoder(t *testing.T) {
 	sf := []SegmentFieldName{"SEG_CODE", "MEMBER_ID"}
-	log.Println("SF: ", sf)
-	full := TextEncoder{Sep1: ":", Sep2: ";", Sep3: ":", Sep4: "#", Sep5: "^", SegmentFields: sf}
-	if _, err := NewTextEncoder(full); err != nil {
-		t.Fatal("TestFullTextFormater: ", err)
+	t.Log("SF: ", sf)
+	params := TextEncoderParameters{
+		Sep1:          ":",
+		Sep2:          ";",
+		Sep3:          ":",
+		Sep4:          "#",
+		Sep5:          "^",
+		SegmentFields: sf}
+
+	_, err := NewTextEncoder(params)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
