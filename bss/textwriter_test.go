@@ -19,7 +19,7 @@ UID,SegID
 12346,102
 `
 
-	p := TextFileParameters{
+	p := xgen.TextEncoderParameters{
 		Sep1:          ":",
 		Sep2:          ";",
 		Sep3:          ",",
@@ -74,7 +74,7 @@ func TestTextWriter(t *testing.T) {
 	12345,100,1440,123
 	12346,101,1440,123`
 
-	params := TextFileParameters(FullFormat)
+	params := xgen.TextEncoderParameters(FullFormat)
 	w, err := NewTextFileWriter("2.txt", params)
 	if err != nil {
 		t.Fatal(err)
