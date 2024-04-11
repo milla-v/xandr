@@ -166,11 +166,11 @@ func NewTextEncoder(parameters TextEncoderParameters) (*TextEncoder, error) {
 	var tf TextEncoder
 	var err error
 
-	if err = checkSeparators(sp); err != nil {
+	if err = checkSegments(parameters.SegmentFields); err != nil {
 		return nil, err
 	}
 
-	if err = checkSegments(parameters.SegmentFields); err != nil {
+	if err = checkSeparators(sp); err != nil {
 		return nil, err
 	}
 
