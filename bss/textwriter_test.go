@@ -12,7 +12,7 @@ import (
 
 var FullFormat = xgen.FullFormat
 
-func TestTextWriter2(t *testing.T) {
+func TestSegmentDataFormatter2(t *testing.T) {
 	const input = `
 UID,SegID
 12345,100
@@ -30,7 +30,7 @@ UID,SegID
 
 	var out bytes.Buffer
 
-	w, err := NewTextFileWriter(&out, p)
+	w, err := NewSegmentDataFormatter(&out, FormatText, &p)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -65,7 +65,7 @@ UID,SegID
 	t.Log("generated file:", out.String())
 }
 
-func TestTextWriter(t *testing.T) {
+func TestSegmentDataFormatter(t *testing.T) {
 	const input = `
 	UID,SegID,Expiration,Value
 	12345,100,1440,123
@@ -75,7 +75,7 @@ func TestTextWriter(t *testing.T) {
 
 	var out bytes.Buffer
 
-	w, err := NewTextFileWriter(&out, params)
+	w, err := NewSegmentDataFormatter(&out, FormatText, &params)
 	if err != nil {
 		t.Fatal(err)
 	}

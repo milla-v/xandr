@@ -2,53 +2,74 @@ package bss
 
 import (
 	"bufio"
+	"errors"
 	"io"
 
 	"github.com/milla-v/xandr/bss/xgen"
 )
 
-// TextFileWriter provides writing user-segments data to a writer stream according Legacy BSS file format
-// described on https://learn.microsoft.com/en-us/xandr/bidders/legacy-bss-file-format
-type TextFileWriter struct {
-	w       *bufio.Writer
-	encoder *xgen.TextEncoder
+type DataFormat string
+
+const (
+	FormatText DataFormat = "text"
+	FormatAvro DataFormat = "avro"
+)
+
+// SegmentDataFormatter provides writing user-segments data to a writer stream according Legacy BSS file format
+// or Avro format described on https://learn.microsoft.com/en-us/xandr/bidders/uploading-segment-data-using-bss
+type SegmentDataFormatter struct {
+	format      DataFormat
+	w           *bufio.Writer
+	textEncoder *xgen.TextEncoder
 }
 
-// NewTextFileWriter creates new BSS text writer.
-func NewTextFileWriter(w io.Writer, params xgen.TextEncoderParameters) (*TextFileWriter, error) {
-	tw := &TextFileWriter{
-		w: bufio.NewWriter(w),
+// NewSegmentDataFormatter creates new BSS text SegmentDataFormatter.
+func NewSegmentDataFormatter(w io.Writer, format DataFormat, params *xgen.TextEncoderParameters) (*SegmentDataFormatter, error) {
+	df := &SegmentDataFormatter{
+		format: format,
+		w:      bufio.NewWriter(w),
+	}
+
+	if format == FormatText && params == nil {
+		return nil, errors.New("text encoder parameters are not specified")
+	}
+
+	if format == FormatAvro {
+		return nil, errors.New("Avro format is not implemented yet")
 	}
 
 	var err error
 
-	tw.encoder, err = xgen.NewTextEncoder(params)
+	df.textEncoder, err = xgen.NewTextEncoder(*params)
 	if err != nil {
 		return nil, err
 	}
 
-	return tw, nil
+	return df, nil
 }
 
 // Close flushes buffered text to the writer.
-func (tw *TextFileWriter) Close() error {
-	if err := tw.w.Flush(); err != nil {
+func (df *SegmentDataFormatter) Close() error {
+	if err := df.w.Flush(); err != nil {
 		return err
 	}
 	return nil
 }
 
 // Append outputs new user record according text format parameters.
-func (w *TextFileWriter) Append(ur *xgen.UserRecord) error {
-	line, err := w.encoder.FormatLine(ur)
-	if err != nil {
-		return err
+func (df *SegmentDataFormatter) Append(ur *xgen.UserRecord) error {
+	if df.format == FormatText {
+		line, err := df.textEncoder.FormatLine(ur)
+		if err != nil {
+			return err
+		}
+
+		_, err = df.w.WriteString(line + "\n")
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	_, err = w.w.WriteString(line + "\n")
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return errors.New("invalid data format. Only text format is implemented")
 }
