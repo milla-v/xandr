@@ -3,7 +3,6 @@ package bss
 import (
 	"bufio"
 	"io"
-	"os"
 
 	"github.com/milla-v/xandr/bss/xgen"
 )
@@ -11,21 +10,16 @@ import (
 // TextFileWriter provides writing user-segments data to a file according Legacy BSS file format
 // described on https://learn.microsoft.com/en-us/xandr/bidders/legacy-bss-file-format
 type TextFileWriter struct {
-	file    io.Closer
 	w       *bufio.Writer
 	encoder *xgen.TextEncoder
 }
 
-func NewTextFileWriter(fname string, params xgen.TextEncoderParameters) (*TextFileWriter, error) {
-	createdFile, err := os.Create(fname)
-	if err != nil {
-		return nil, err
+func NewTextFileWriter(w io.Writer, params xgen.TextEncoderParameters) (*TextFileWriter, error) {
+	tw := &TextFileWriter{
+		w: bufio.NewWriter(w),
 	}
 
-	tw := &TextFileWriter{
-		w:    bufio.NewWriter(createdFile),
-		file: createdFile,
-	}
+	var err error
 
 	tw.encoder, err = xgen.NewTextEncoder(params)
 	if err != nil {
@@ -37,9 +31,6 @@ func NewTextFileWriter(fname string, params xgen.TextEncoderParameters) (*TextFi
 
 func (tw *TextFileWriter) Close() error {
 	if err := tw.w.Flush(); err != nil {
-		return err
-	}
-	if err := tw.file.Close(); err != nil {
 		return err
 	}
 	return nil
