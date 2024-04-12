@@ -1,8 +1,8 @@
 package bss
 
 import (
+	"bytes"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -12,7 +12,7 @@ import (
 
 var FullFormat = xgen.FullFormat
 
-func TestTextWriter2(t *testing.T) {
+func TestSegmentDataFormatter2(t *testing.T) {
 	const input = `
 UID,SegID
 12345,100
@@ -28,7 +28,9 @@ UID,SegID
 		SegmentFields: []xgen.SegmentFieldName{xgen.SegIdField},
 	}
 
-	w, err := NewTextFileWriter("1.txt", p)
+	var out bytes.Buffer
+
+	w, err := NewSegmentDataFormatter(&out, FormatText, &p)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,22 +62,20 @@ UID,SegID
 		t.Fatal(err)
 	}
 
-	buf, err := os.ReadFile("1.txt")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	t.Log("generated file:", string(buf))
+	t.Log("generated file:", out.String())
 }
 
-func TestTextWriter(t *testing.T) {
+func TestSegmentDataFormatter(t *testing.T) {
 	const input = `
 	UID,SegID,Expiration,Value
 	12345,100,1440,123
 	12346,101,1440,123`
 
 	params := xgen.TextEncoderParameters(FullFormat)
-	w, err := NewTextFileWriter("2.txt", params)
+
+	var out bytes.Buffer
+
+	w, err := NewSegmentDataFormatter(&out, FormatText, &params)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,4 +114,6 @@ func TestTextWriter(t *testing.T) {
 	if err := w.Close(); err != nil {
 		t.Fatal(err)
 	}
+
+	t.Log("generated file:", out.String())
 }
