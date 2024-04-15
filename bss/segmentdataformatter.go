@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 
+	"github.com/milla-v/xandr/bss/avro"
 	"github.com/milla-v/xandr/bss/xgen"
 )
 
@@ -21,10 +22,13 @@ type SegmentDataFormatter struct {
 	format      DataFormat
 	w           *bufio.Writer
 	textEncoder *xgen.TextEncoder
+	avroEncoder *avro.AvroWriter
 }
 
 // NewSegmentDataFormatter creates new BSS text SegmentDataFormatter.
 func NewSegmentDataFormatter(w io.Writer, format DataFormat, params *xgen.TextEncoderParameters) (*SegmentDataFormatter, error) {
+	var err error
+
 	df := &SegmentDataFormatter{
 		format: format,
 		w:      bufio.NewWriter(w),
@@ -35,10 +39,12 @@ func NewSegmentDataFormatter(w io.Writer, format DataFormat, params *xgen.TextEn
 	}
 
 	if format == FormatAvro {
-		return nil, errors.New("Avro format is not implemented yet")
+		df.avroEncoder, err = avro.NewAvroWriter(df.w)
+		if err != nil {
+			return nil, err
+		}
+		return df, err
 	}
-
-	var err error
 
 	df.textEncoder, err = xgen.NewTextEncoder(*params)
 	if err != nil {
@@ -56,10 +62,14 @@ func (df *SegmentDataFormatter) Close() error {
 	return nil
 }
 
-// Append outputs new user record according text format parameters.
-func (df *SegmentDataFormatter) Append(ur *xgen.UserRecord) error {
-	if df.format == FormatText {
-		line, err := df.textEncoder.FormatLine(ur)
+// Append outputs users records to a writer.
+func (df *SegmentDataFormatter) Append(users []*xgen.UserRecord) error {
+	if df.format == FormatAvro {
+		return df.avroEncoder.Append(users)
+	}
+
+	for _, user := range users {
+		line, err := df.textEncoder.FormatLine(user)
 		if err != nil {
 			return err
 		}
@@ -68,8 +78,7 @@ func (df *SegmentDataFormatter) Append(ur *xgen.UserRecord) error {
 		if err != nil {
 			return err
 		}
-		return nil
 	}
 
-	return errors.New("invalid data format. Only text format is implemented")
+	return nil
 }
