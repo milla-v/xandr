@@ -12,6 +12,7 @@ type Segment struct {
 	MemberID   int32
 	Expiration int32
 	Value      int32
+	Timestamp  int64
 }
 
 type Domain string
