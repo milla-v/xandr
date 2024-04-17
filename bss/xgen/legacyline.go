@@ -16,6 +16,7 @@ const (
 	MemberIdField   SegmentFieldName = "MEMBER_ID"
 	ExpirationField SegmentFieldName = "EXPIRATION"
 	ValueField      SegmentFieldName = "VALUE"
+	TimestampField  SegmentFieldName = "TIMESTAMP"
 	NotAllowed                       = "[](){}$\\/|?*+-"
 )
 
@@ -65,6 +66,7 @@ var FullExternalFormat = TextEncoderParameters{
 		MemberIdField,
 		ExpirationField,
 		ValueField,
+		TimestampField,
 	},
 }
 

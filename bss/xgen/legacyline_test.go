@@ -2,6 +2,7 @@ package xgen
 
 import (
 	"testing"
+	"time"
 )
 
 func TestDefault(t *testing.T) {
@@ -85,7 +86,7 @@ func TestFullIdfa(t *testing.T) {
 		Domain: IDFA,
 		Segments: []Segment{
 			{ID: 100, Expiration: 1440, Value: 123},
-			{ID: 101, Expiration: 1440, Value: 123},
+			{ID: 101, Expiration: 1440, Value: 123, Timestamp: time.Now().Unix()},
 		},
 	}
 
