@@ -85,7 +85,7 @@ func TestFullIdfa(t *testing.T) {
 		UID:    "0000-123123-132123123-3212312",
 		Domain: IDFA,
 		Segments: []Segment{
-			{ID: 100, Expiration: 1440, Value: 123},
+			{ID: 100, Expiration: 1440, Value: 123, Timestamp: time.Now().Unix()},
 			{ID: 101, Expiration: 1440, Value: 123, Timestamp: time.Now().Unix()},
 		},
 	}
