@@ -53,6 +53,7 @@ var FullFormat = TextEncoderParameters{
 		SegIdField,
 		ExpirationField,
 		ValueField,
+		TimestampField,
 	},
 }
 
@@ -145,7 +146,7 @@ func genSegments(w io.Writer, tf *TextEncoder, list []Segment) error {
 				}
 				fmt.Fprintf(w, "%d", seg.Value)
 			case TimestampField:
-				log.Println("TimestempField: ", seg.Timestamp)
+				fmt.Fprintf(w, "%d", seg.Timestamp)
 			}
 
 			if j < len(tf.parameters.SegmentFields)-1 {

@@ -2,7 +2,6 @@ package xgen
 
 import (
 	"testing"
-	"time"
 )
 
 func TestDefault(t *testing.T) {
@@ -75,7 +74,7 @@ func TestFull(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if line != "12345:100:1440:123;101:1440:123" {
+	if line != "12345:100:1440:123:0;101:1440:123:0" {
 		t.Fatal("invalid line:", line)
 	}
 }
@@ -85,8 +84,8 @@ func TestFullIdfa(t *testing.T) {
 		UID:    "0000-123123-132123123-3212312",
 		Domain: IDFA,
 		Segments: []Segment{
-			{ID: 100, Expiration: 1440, Value: 123, Timestamp: time.Now().Unix()},
-			{ID: 101, Expiration: 1440, Value: 123, Timestamp: time.Now().Unix()},
+			{ID: 100, Expiration: 1440, Value: 123, Timestamp: 123456},
+			{ID: 101, Expiration: 1440, Value: 123, Timestamp: 123456},
 		},
 	}
 
@@ -100,7 +99,7 @@ func TestFullIdfa(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if line != "0000-123123-132123123-3212312:100:1440:123;101:1440:123^3" {
+	if line != "0000-123123-132123123-3212312:100:1440:123:123456;101:1440:123:123456^3" {
 		t.Fatal("invalid line:", line)
 	}
 }
