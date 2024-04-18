@@ -3,7 +3,6 @@ package xgen
 import (
 	"fmt"
 	"io"
-	"log"
 	"strings"
 )
 
@@ -119,13 +118,11 @@ func genSegments(w io.Writer, tf *TextEncoder, list []Segment) error {
 		for j, sf := range tf.parameters.SegmentFields {
 			switch sf {
 			case SegIdField:
-				log.Println("SegIDField", seg.ID)
 				if seg.ID == 0 {
 					return fmt.Errorf("seg[%d].ID is zero", i)
 				}
 				fmt.Fprintf(w, "%d", seg.ID)
 			case SegCodeField:
-				log.Println("SegCodeField", seg.Code)
 				if seg.Code == "" {
 					return fmt.Errorf("seg[%d].Code is empty", i)
 				}
