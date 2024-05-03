@@ -1,7 +1,6 @@
 package xgen
 
 import (
-	"log"
 	"testing"
 )
 
@@ -239,7 +238,6 @@ func TestFullTextEncoder(t *testing.T) {
 }
 
 func TestCheckIfNum(t *testing.T) {
-	log.Println("----------TEST IF NUMBER----------")
 	var err error
 	str := []string{"123456", "A123456789", "0"}
 	for i := 0; i < len(str); i++ {
@@ -247,13 +245,12 @@ func TestCheckIfNum(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		log.Println(str[i], " is ", isNum)
+		t.Log(str[i], " is ", isNum)
 	}
 
 }
 
 func TestCheckIfLetter(t *testing.T) {
-	log.Println("----------TEST IF LETTER----------")
 	var err error
 	str := []string{"abc", "&@$&", "1234567890", "a6&"}
 	for i := 0; i < len(str); i++ {
@@ -261,18 +258,17 @@ func TestCheckIfLetter(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		log.Println("isLetter test: ", str[i], " is ", isLetter)
+		t.Log("isLetter test: ", str[i], " is ", isLetter)
 	}
 }
 
 func TestCheckSeparators(t *testing.T) {
-	log.Println("----------TEST CHECK SEPARATORS----------")
 	var err error
 	str := []string{";", ":"}
 	err = checkSeparators(str)
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Println(str, " is ", err)
+	t.Log(str, " is ", err)
 
 }

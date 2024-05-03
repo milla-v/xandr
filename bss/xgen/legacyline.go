@@ -233,34 +233,28 @@ func checkSeparators(sp []string) error {
 		if strings.ContainsAny(s, NotAllowed) {
 			return fmt.Errorf("sep%d: symbols "+NotAllowed+" are not allowed as a separators", i+1)
 		}
-		check := checkIfNum(s)
-		if check == true {
-			err := errors.New("Separator cannot be a number")
-			return err
+		if checkIfNum(s) {
+			return errors.New("Separator cannot be a number")
 		}
-		check = checkIfLetter(s)
-		if check == true {
-			err := errors.New("Separator cannot be a letter")
-			return err
+		if checkIfLetter(s) {
+			return errors.New("Separator cannot be a letter")
 		}
 	}
 	return nil
 }
 
-func checkIfNum(str string) bool {
-	for _, s := range str {
-		check := unicode.IsNumber(s)
-		if check == false {
+func checkIfNum(s string) bool {
+	for _, r := range s {
+		if !unicode.IsNumber(r) {
 			return false
 		}
 	}
 	return true
 }
 
-func checkIfLetter(str string) bool {
-	for _, s := range str {
-		check := unicode.IsLetter(s)
-		if check == false {
+func checkIfLetter(s string) bool {
+	for _, r := range s {
+		if !unicode.IsLetter(r) {
 			return false
 		}
 	}
