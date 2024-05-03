@@ -1,9 +1,11 @@
 package xgen
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strings"
+	"unicode"
 )
 
 const legacyLineTemplate = "{UID}{SEP_1}{SEGMENTS_TO_ADD}{SEP_4}{SEGMENTS_TO_REMOVE}{SEP_5}{DOMAIN}"
@@ -231,6 +233,36 @@ func checkSeparators(sp []string) error {
 		if strings.ContainsAny(s, NotAllowed) {
 			return fmt.Errorf("sep%d: symbols "+NotAllowed+" are not allowed as a separators", i+1)
 		}
+		check := checkIfNum(s)
+		if check == true {
+			err := errors.New("Separator cannot be a number")
+			return err
+		}
+		check = checkIfLetter(s)
+		if check == true {
+			err := errors.New("Separator cannot be a letter")
+			return err
+		}
 	}
 	return nil
+}
+
+func checkIfNum(str string) bool {
+	for _, s := range str {
+		check := unicode.IsNumber(s)
+		if check == false {
+			return false
+		}
+	}
+	return true
+}
+
+func checkIfLetter(str string) bool {
+	for _, s := range str {
+		check := unicode.IsLetter(s)
+		if check == false {
+			return false
+		}
+	}
+	return true
 }
