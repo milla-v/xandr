@@ -239,26 +239,26 @@ func TestFullTextEncoder(t *testing.T) {
 
 func TestCheckIfNum(t *testing.T) {
 	var err error
-	str := []string{"123456", "A123456789", "0"}
+	str := []string{"123456", "0"}
 	for i := 0; i < len(str); i++ {
-		isNum := checkIfNum(str[i])
-		if err != nil {
+		if !checkIfNum(str[i]) {
+			t.Log(str[i], " is not a number")
 			t.Fatal(err)
 		}
-		t.Log(str[i], " is ", isNum)
+		t.Log("if number test", str[i], " is ", checkIfNum(str[i]))
 	}
 
 }
 
 func TestCheckIfLetter(t *testing.T) {
 	var err error
-	str := []string{"abc", "&@$&", "1234567890", "a6&"}
+	str := []string{"abc", "AA"}
 	for i := 0; i < len(str); i++ {
-		isLetter := checkIfLetter(str[i])
-		if err != nil {
+		if !checkIfLetter(str[i]) {
+			t.Log(str[i], " is not a letter")
 			t.Fatal(err)
 		}
-		t.Log("isLetter test: ", str[i], " is ", isLetter)
+		t.Log("ifLetter test: ", str[i], " is ", checkIfLetter(str[i]))
 	}
 }
 
