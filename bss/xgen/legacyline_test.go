@@ -239,9 +239,9 @@ func TestFullTextEncoder(t *testing.T) {
 
 func TestCheckIfNum(t *testing.T) {
 	str := []string{"123456"}
-	for i := 0; i < len(str); i++ {
-		if !checkIfNum(str[i]) {
-			t.Fatal(str[i] + " is not a number")
+	for _, s := range str {
+		if !checkIfNum(s) {
+			t.Fatal(s + " is not a number")
 		}
 	}
 
@@ -249,11 +249,10 @@ func TestCheckIfNum(t *testing.T) {
 
 func TestCheckIfLetter(t *testing.T) {
 	str := []string{"abc", "AA"}
-	for i := 0; i < len(str); i++ {
-		if !checkIfLetter(str[i]) {
-			t.Fatal(str[i] + " is not a letter")
+	for _, s := range str {
+		if !checkIfLetter(s) {
+			t.Fatal(s + " is not a letter")
 		}
-		//t.Log("ifLetter test: ", str[i], " is ", checkIfLetter(str[i]))
 	}
 }
 
