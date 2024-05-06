@@ -236,3 +236,30 @@ func TestFullTextEncoder(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestCheckIfNum(t *testing.T) {
+	str := []string{"123456"}
+	for _, s := range str {
+		if !checkIfNum(s) {
+			t.Fatal(s + " is not a number")
+		}
+	}
+
+}
+
+func TestCheckIfLetter(t *testing.T) {
+	str := []string{"abc", "AA"}
+	for _, s := range str {
+		if !checkIfLetter(s) {
+			t.Fatal(s + " is not a letter")
+		}
+	}
+}
+
+func TestCheckSeparators(t *testing.T) {
+	str := []string{";", ":"}
+	err := checkSeparators(str)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
