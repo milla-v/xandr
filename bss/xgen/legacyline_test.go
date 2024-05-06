@@ -244,7 +244,6 @@ func TestCheckIfNum(t *testing.T) {
 			t.Fatal(s + " is not a number")
 		}
 	}
-
 }
 
 func TestCheckIfLetter(t *testing.T) {
